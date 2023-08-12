@@ -2,7 +2,6 @@ plugins {
     id("com.android.application")
 }
 
-
 android {
     namespace = "com.example.tppy"
     compileSdk = 33
@@ -42,84 +41,6 @@ android {
         viewBinding = true
     }
 }
-
-tasks.whenTaskAdded {
-
-    if (name.equals("packageDebug")) {
-
-        val inputFile = File(projectDir.absolutePath
-                + File.separator
-                + "src"
-                + File.separator
-                + "main"
-                + File.separator
-                + "python"
-                + File.separator
-                + "test.py")
-
-        val outputFile = File(projectDir.absolutePath
-                + File.separator
-                + "src"
-                + File.separator
-                + "main"
-                + File.separator
-                + "cpp"
-                + File.separator
-                + "native-lib.cpp")
-
-        var inputText = inputFile.readText()
-
-        var replaceText = "";
-        inputText.lines().forEach { line ->
-            // 在这里处理每一行
-            println(line)
-            replaceText = replaceText + "\"" + line + "\\n\"" + "\n"
-        }
-
-        val outputText = "#include <jni.h>\n" +
-                "#include <string>\n" +
-                "#include \"pocketpy.h\"\n" +
-                "#include <fstream>\n" +
-                "\n" +
-                "#include <fstream>\n" +
-                "#include <vector>\n" +
-                "\n" +
-                "char* ret;\n" +
-                "void my_print(pkpy_vm* vm, const char* data, int len){\n" +
-                "\n" +
-                "    ret = new char[len];\n" +
-                "    memcpy(ret,data,len);\n" +
-                "    ret[len - 1] = '\\0';\n" +
-                "\n" +
-                "}\n" +
-                "\n" +
-                "extern \"C\" JNIEXPORT jstring JNICALL\n" +
-                "Java_com_example_tppy_MainActivity_stringFromJNI(\n" +
-                "        JNIEnv* env,\n" +
-                "        jobject /* this */) {\n" +
-                "\n" +
-                "    // Create a virtual machine\n" +
-                "    VM* vm = new VM();\n" +
-                "\n" +
-                "    pkpy_set_output_handler(reinterpret_cast<pkpy_vm *>(vm), &my_print);\n" +
-                "\n" +
-                "    // Create a list\n" +
-                "    vm->exec(" +
-                replaceText +
-                ", \"main.py\", EXEC_MODE);\n" +
-                "\n" +
-                "\n" +
-                "    std::string hello = \"Hello from C++ and python \" + std::string(ret);\n" +
-                "    return env->NewStringUTF(hello.c_str());\n" +
-                "}"
-
-        outputFile.writeText(outputText)
-
-    }
-
-}
-
-
 
 dependencies {
 
